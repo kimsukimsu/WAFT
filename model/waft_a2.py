@@ -138,7 +138,12 @@ class WAFTv2(nn.Module):
         fmap1_2x = self.fmap_conv(torch.cat([fmap1_pretrain, fmap1_img], dim=1))
         fmap2_2x = self.fmap_conv(torch.cat([fmap2_pretrain, fmap2_img], dim=1))
         net = self.hidden_conv(torch.cat([fmap1_2x, fmap2_2x], dim=1))
-        flow_2x = torch.zeros(N, 2, H//2, W//2).to(image1.device)
+        #Flow Perturbution 실험 
+        noise_scale = 1.0  #가우시안 분포의 표준편차 
+        flow_2x = torch.randn(N, 2, H//2, W//2).to(image1.device) * noise_scale
+        """
+        flow_2x = torch.zeros(N, 2, H//2, W//2).to(image1.device) 기존에는 0으로 initialize
+        """
         for itr in range(iters):
             flow_2x = flow_2x.detach()
             coords2 = (coords_grid(N, H//2, W//2, device=image1.device) + flow_2x).detach()
